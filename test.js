@@ -39,10 +39,11 @@ describe('UdpStream', function () {
     });
     
     it('should pass messages', function (done) {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: '127.0.0.1',
             port: BIND_PORT
-        }, function (e, client) {
+        }, function (e) {
             if (e) { done(e); return; }
 
             onMessage(done.bind(null, null));
@@ -52,10 +53,11 @@ describe('UdpStream', function () {
     });
     
     it('should support dns resolution', function (done) {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: 'localhost',
             port: BIND_PORT
-        }, function (e, client) {
+        }, function (e) {
             if (e) { done(e); return; }
 
             onMessage(done.bind(null, null));
@@ -65,10 +67,11 @@ describe('UdpStream', function () {
     });
     
     it('should support IPv6', function (done) {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: '::1',
             port: BIND_PORT
-        }, function (e, client) {
+        }, function (e) {
             if (e) { done(e); return; }
 
             onMessage(done.bind(null, null));
@@ -78,10 +81,11 @@ describe('UdpStream', function () {
     });
 
     it('should end gracefully', function (done) {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: 'localhost',
             port: BIND_PORT
-        }, function (e, client) {
+        }, function (e) {
             if (e) { done(e); return; }
          
             client.end(done);
@@ -89,10 +93,11 @@ describe('UdpStream', function () {
     });
     
     it('should error on write after end', function () {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: 'localhost',
             port: BIND_PORT
-        }, function (e, client) {
+        }, function (e) {
             if (e) { done(e); return; }
          
             client.end();
@@ -103,7 +108,8 @@ describe('UdpStream', function () {
     });
     
     it('should pass along socket errors and end', function (done) {
-        UdpStream.create({
+        var client = new UdpStream();
+        client.connect({
             host: 'localhost',
             port: BIND_PORT
         }, function (e, client) {
@@ -122,20 +128,23 @@ describe('UdpStream', function () {
     });
     
     it('should fail if no port is provided', function (done) {
-        UdpStream.create(function (err, res) {
+        var client = new UdpStream();
+        client.connect(function (err, res) {
             err.message.should.match(/opts\.port is required/);
             done();
         });
     });
     
     it('should not throw synchronously with invalid parameters', function () {
-        UdpStream.create();
-        UdpStream.create('foo');
-        UdpStream.create(null);
-        UdpStream.create(null, null);
+        function swallow() { }
+
+        UdpStream.create().on('error', swallow);
+        UdpStream.create('foo').on('error', swallow);
+        UdpStream.create(null).on('error', swallow);
+        UdpStream.create(null, null).on('error', swallow);
         UdpStream.create({
             host: null,
             port: null
-        });
+        }).on('error', swallow);
     });
 });
