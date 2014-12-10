@@ -114,6 +114,18 @@ describe('UdpStream', function () {
         });
     });
     
+    it('should emit a \'close\' event', function (done) {
+        var client = new UdpStream();
+        client.connect({
+            host: 'localhost',
+            port: BIND_PORT
+        }, function (e) {
+            if (e) { done(e); return; }
+            client.on('close', done);
+            client.end();
+        });
+    });
+    
     it('should error on write after end', function () {
         var client = new UdpStream();
         client.connect({

@@ -102,6 +102,8 @@ UdpStream.prototype.connect = function (/*opts, cb*/) {
         cleanup = function () {
             self.socket.removeListener('error', onError);
             self.socket.removeListener('close', onClose);
+            
+            self.emit('close');
         };
         
         self.socket.once('error', onError);
