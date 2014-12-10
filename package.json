@@ -1,0 +1,15 @@
+{
+  "name": "udp-streams2",
+  "version": "1.0.0",
+  "description": "Writable stream implementation of dgram.send",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -u bdd -R spec --bail test.js"
+  },
+  "author": "Kris Reeves",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "should": "^4.3.1"
+  }
+}
