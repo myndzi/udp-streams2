@@ -25,6 +25,8 @@ UdpStream.create = function (opts, cb) {
         opts = opts || { };
     }
     
+    if (typeof cb !== 'function') { cb = function () { }; }
+    
     var stream = new UdpStream();
     
     if (!opts.host) { opts.host = '127.0.0.1'; }
@@ -54,6 +56,17 @@ UdpStream.create = function (opts, cb) {
 };
 UdpStream.prototype._connect = function (opts, cb) {
     var self = this;
+    
+    if (typeof cb !== 'function') { cb = function () { }; }
+    
+    if (!opts || !opts.host) {
+        cb(new Error('opts.host is required'));
+        return;
+    }
+    if (!opts || !opts.port) {
+        cb(new Error('opts.port is required'));
+        return;
+    }
     
     try {
         self.socket = dgram.createSocket(opts.type);

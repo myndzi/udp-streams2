@@ -120,4 +120,22 @@ describe('UdpStream', function () {
             client.socket.emit('error', 'fake');
         });
     });
+    
+    it('should fail if no port is provided', function (done) {
+        UdpStream.create(function (err, res) {
+            err.message.should.match(/opts\.port is required/);
+            done();
+        });
+    });
+    
+    it('should not throw synchronously with invalid parameters', function () {
+        UdpStream.create();
+        UdpStream.create('foo');
+        UdpStream.create(null);
+        UdpStream.create(null, null);
+        UdpStream.create({
+            host: null,
+            port: null
+        });
+    });
 });
