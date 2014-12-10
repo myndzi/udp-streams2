@@ -22,9 +22,41 @@ UdpStream.create = function (opts, cb) {
     });
     return stream;
 };
-
-UdpStream.prototype.connect = function (opts, cb) {
-    var self = this;
+UdpStream.parseArgs = function () {
+    if (arguments.length === 0) { return { }; }
+    
+    var i = arguments.length, args = new Array(i);
+    while (i--) { args[i] = arguments[i]; }
+    
+    var opts = { }, cb;
+    if (typeof args[args.length-1] === 'function') {
+        opts.cb = args.pop();
+    }
+    
+    if (typeof args[0] === 'number') {
+        opts.port = args.shift();
+    }
+    
+    if (typeof args[0] === 'string') {
+        opts.host = args.shift();
+    }
+    if (args[0] && typeof args[0] === 'object') {
+        Object.keys(args[0]).forEach(function (key) {
+            opts[key] = args[0][key];
+        });
+    }
+    
+    if (isNaN(parseInt(opts.port, 10))) {
+        opts.port = null;//delete opts.port;
+    }
+    
+    return opts;
+};
+UdpStream.prototype.connect = function (/*opts, cb*/) {
+    var self = this, cb;
+    
+    var opts = UdpStream.parseArgs.apply(this, arguments);
+    if (opts.cb) { cb = opts.cb; delete opts.cb; }
 
     var _onError = function (err) {
         if (typeof cb === 'function') { cb(err); }
@@ -35,14 +67,9 @@ UdpStream.prototype.connect = function (opts, cb) {
         self.emit('connect', self);
     };
     
-    if (typeof opts === 'function') {
-        cb = opts;
-        opts = { };
-    } else {
-        opts = opts || { };
-    }
-    
     if (!opts.host) { opts.host = '127.0.0.1'; }
+    
+    if (!opts.port) { return _onError(new Error('opts.port is required')); }
     
     var connect = function () {
         if (net.isIPv4(opts.host)) {
@@ -50,12 +77,9 @@ UdpStream.prototype.connect = function (opts, cb) {
         } else if (net.isIPv6(opts.host)) {
             opts.type = 'udp6';
         } else {
-            _onError(new Error('Invalid host: ' + opts.host));
-            return;
+            return _onError(new Error('Invalid host: ' + opts.host));
         }
         
-        if (!opts || !opts.host) { return _onError(new Error('opts.host is required')); }
-        if (!opts || !opts.port) { return _onError(new Error('opts.port is required')); }
         
         try { self.socket = dgram.createSocket(opts.type); }
         catch (e) { return _onError(e); }

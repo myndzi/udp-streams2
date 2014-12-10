@@ -52,6 +52,28 @@ describe('UdpStream', function () {
         });
     });
     
+    it('should support connect(port, host) syntax', function (done) {
+        var client = new UdpStream();
+        client.connect(BIND_PORT, '127.0.0.1', function (e) {
+            if (e) { done(e); return; }
+
+            onMessage(done.bind(null, null));
+            
+            client.write('hello');
+        });
+    });
+    
+    it('should support connect(port) syntax', function (done) {
+        var client = new UdpStream();
+        client.connect(BIND_PORT, function (e) {
+            if (e) { done(e); return; }
+
+            onMessage(done.bind(null, null));
+            
+            client.write('hello');
+        });
+    });
+    
     it('should support dns resolution', function (done) {
         var client = new UdpStream();
         client.connect({
@@ -135,13 +157,21 @@ describe('UdpStream', function () {
         });
     });
     
-    it('should not throw synchronously with invalid parameters', function () {
-        function swallow() { }
+    it('should not throw synchronously with invalid parameters', function (done) {
+        this.timeout(40000);
+        var count = 0;
+        function swallow() {
+            count++;
+            if (count === 8) { done(); }
+        }
 
         UdpStream.create().on('error', swallow);
         UdpStream.create('foo').on('error', swallow);
+        UdpStream.create('foo', 'foo').on('error', swallow);
+        UdpStream.create('foo', 'foo', 'foo').on('error', swallow);
         UdpStream.create(null).on('error', swallow);
         UdpStream.create(null, null).on('error', swallow);
+        UdpStream.create(null, null, null).on('error', swallow);
         UdpStream.create({
             host: null,
             port: null
