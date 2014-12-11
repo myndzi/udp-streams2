@@ -114,6 +114,11 @@ describe('UdpStream', function () {
         });
     });
     
+    it('should emit a \'connect\' event on the next tick', function (done) {
+        var client = new UdpStream();
+        client.connect({ host: '127.0.0.1', port: BIND_PORT });
+        client.on('connect', done.bind(null, null));
+    });
     it('should emit a \'close\' event', function (done) {
         var client = new UdpStream();
         client.connect({
@@ -121,9 +126,9 @@ describe('UdpStream', function () {
             port: BIND_PORT
         }, function (e) {
             if (e) { done(e); return; }
-            client.on('close', done);
             client.end();
         });
+        client.on('close', done.bind(null, null));
     });
     
     it('should error on write after end', function () {

@@ -64,7 +64,9 @@ UdpStream.prototype.connect = function (/*opts, cb*/) {
     };
     var _onConnect = function () {
         if (typeof cb === 'function') { cb(null, self); }
-        self.emit('connect', self);
+        process.nextTick(function () {
+            self.emit('connect', self);
+        });
     };
     
     if (!opts.host) { opts.host = '127.0.0.1'; }
