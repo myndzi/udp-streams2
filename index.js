@@ -125,9 +125,33 @@ UdpStream.prototype.connect = function (/*opts, cb*/) {
     }
 };
 
-UdpStream.prototype.end = function () {
-    UdpStream.super_.prototype.end.apply(this, arguments);
-    this.socket.close();
+UdpStream.prototype.end = function (/*chunk, encoding, callback*/) {
+    var i = arguments.length, args = new Array(i);
+    while (i--) { args[i] = arguments[i]; }
+    
+    var chunk, encoding = 'utf8', callback, parentCallback;
+    
+    if (typeof args[args.length-1] === 'function') {
+        parentCallback = args.pop();
+    }
+    
+    if (typeof args[0] === 'string' || Buffer.isBuffer(args[0])) {
+        chunk = args.shift();
+        if (typeof chunk === 'string' && args.length && typeof args[0] === 'string') {
+            encoding = args.shift();
+        }
+    }
+    
+    callback = function () {
+        this.socket.close();
+        if (parentCallback) { parentCallback.apply(null, arguments); }
+    }.bind(this);
+    
+    if (chunk) {
+        UdpStream.super_.prototype.end.call(this, chunk, encoding, callback);
+    } else {
+        UdpStream.super_.prototype.end.call(this, callback);
+    }
 };
 
 

@@ -194,4 +194,25 @@ describe('UdpStream', function () {
             port: null
         }).on('error', swallow);
     });
+    
+    it('should wait until stream is ended to destroy socket (fixes syslog2 #3, #4)', function (done) {
+        var PassThrough = require('stream').PassThrough;
+        var client = new UdpStream(),
+            pt = new PassThrough();
+        
+        client.connect({
+            host: '127.0.0.1',
+            port: BIND_PORT
+        }, function (e) {
+            if (e) { done(e); return; }
+
+            pt.pipe(client);
+            
+            pt.write('one', function () {
+                pt.write('two', function () {
+                    pt.end(done.bind(null, null));
+                });
+            });
+        });
+    });
 });
