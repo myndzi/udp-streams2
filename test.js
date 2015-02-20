@@ -14,6 +14,7 @@ describe('UdpStream', function () {
     var onMessage = function (cb) { _onMessage = cb; }
     
     before(function (_done) {
+
         var count = 2;
         function done() {
             count--;
@@ -22,12 +23,18 @@ describe('UdpStream', function () {
         server = dgram.createSocket('udp4', function () {
             _onMessage.apply(null, arguments);
         });
-        server.bind(BIND_PORT, done);
+        server.bind({
+            address: '127.0.0.1',
+            port: BIND_PORT
+        }, done);
         
         server6 = dgram.createSocket('udp6', function () {
             _onMessage.apply(null, arguments);
         });
-        server6.bind(BIND_PORT, done);
+        server6.bind({
+            address: '::1',
+            port: BIND_PORT
+        }, done);
     });
     
     after(function () {

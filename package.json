@@ -1,6 +1,6 @@
 {
   "name": "udp-streams2",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Writable stream implementation of dgram.send",
   "main": "index.js",
   "scripts": {
