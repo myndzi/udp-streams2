@@ -8,12 +8,15 @@
   },
   "main": "index.js",
   "scripts": {
+    "bamp": "bamp",
     "test": "mocha -u bdd -R spec --bail test.js"
   },
   "author": "Kris Reeves",
   "license": "ISC",
   "devDependencies": {
-    "mocha": "^2.0.1",
-    "should": "^4.3.1"
-  }
+    "bamp": "^1.0.11",
+    "mocha": "^6.1.4",
+    "should": "^13.2.3"
+  },
+  "dependencies": {}
 }
