@@ -23,18 +23,12 @@ describe('UdpStream', function () {
         server = dgram.createSocket('udp4', function () {
             _onMessage.apply(null, arguments);
         });
-        server.bind({
-            address: '127.0.0.1',
-            port: BIND_PORT
-        }, done);
+        server.bind(BIND_PORT, '127.0.0.1', done);
 
         server6 = dgram.createSocket('udp6', function () {
             _onMessage.apply(null, arguments);
         });
-        server6.bind({
-            address: '::1',
-            port: BIND_PORT
-        }, done);
+        server6.bind(BIND_PORT, '::1', done);
     });
 
     after(function () {
@@ -138,7 +132,7 @@ describe('UdpStream', function () {
         client.on('close', done.bind(null, null));
     });
 
-    it('should error on write after end', function () {
+    it('should error on write after end', function (done) {
         var client = new UdpStream();
         client.connect({
             host: 'localhost',
@@ -146,10 +140,12 @@ describe('UdpStream', function () {
         }, function (e) {
             if (e) { done(e); return; }
 
+            client.on('error', function () { });
             client.end();
-            (function () {
-                client.write('foo');
-            }).should.throw(/write after end/);
+            client.write('foo', function (err) {
+                err.message.should.match(/write after end/);
+                done();
+            });
         });
     });
 

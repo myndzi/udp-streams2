@@ -7,7 +7,7 @@ var Writable = require('stream').Writable,
     dgram = require('dgram');
 
 function UdpStream() {
-    Writable.call(this);
+    Writable.call(this, { autoDestroy: false });
 
     this.socket = null;
     this.host = null;
